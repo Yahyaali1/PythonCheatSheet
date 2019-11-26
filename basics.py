@@ -68,3 +68,8 @@ full_name = f"{first} {last}"
 full_name_exp = f"{len(first)}"
 print(full_name)
 print("Valid Expression example", full_name_exp)
+
+# Operators
+# - Div for int and floating point
+# Exponent operators
+# Augmented Operator
