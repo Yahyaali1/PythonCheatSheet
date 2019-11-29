@@ -2,85 +2,69 @@
 For reading data and generating weather report
 """
 import os
-from datetime import datetime
+from weatherobj import WeatherObj
+from utils import replace_string_in_dict
 
 
 class WeatherReport:
     __FILE_PREFIX = "lahore_weather"
     __KEY_DATE = "PKT"
-    __KEY_SUMMARY = "SUMMARY"
-    __KEYS_WEATHER_ATTRIB = ["Max TemperatureC", "Min TemperatureC", "Max Humidity", "Min Humidity"]
-    __DATE_FORMAT = '%Y-%m-%d'
+    __KEY_DATE_ALTER = "PKST"
 
     def __init__(self, path_to_dir):
         self.__path_to_dir = path_to_dir
         self.weather_data = dict()
 
     def __get_file_list(self):
-        return [file_name for file_name in os.listdir(f'.{self.__path_to_dir}')
-                      if file_name.startswith(self.__FILE_PREFIX)]
+        return [f'.{self.__path_to_dir}/{file_name}' for file_name in os.listdir(f'.{self.__path_to_dir}')
+                if file_name.startswith(self.__FILE_PREFIX)]
 
-    def __update_attributes_summary(self, summary_old, summary_new):
-        """
-        Update the date for hottest day
-        Updates other attributes if necessary
-        :param summary_old:
-        :param summary_new:
-        :return:
-        """
-        if self.__is_hotter_day(summary_old, summary_new[self.__KEY_SUMMARY]["Min TemperatureC"],
-                                summary_new[self.__KEY_SUMMARY]["Max TemperatureC"]):
-            summary_old[self.__KEY_DATE] = summary_new[self.__KEY_DATE]
-
-        for key in self.__KEYS_WEATHER_ATTRIB:
-            if summary_old[self.__KEY_SUMMARY][key] < summary_new[self.__KEY_SUMMARY][key]:
-                summary_old[self.__KEY_SUMMARY][key] = summary_new[self.__KEY_SUMMARY][key]
-
-    def __is_hotter_day(self, summary, new_min_temp, new_max_temp):
-        return new_min_temp > summary[self.__KEY_SUMMARY]["Min TemperatureC"] and \
-               new_max_temp > summary[self.__KEY_SUMMARY]["Max TemperatureC"]
-
-    def __form_summary_dict(self, data_dic):
-        summary = {self.__KEY_SUMMARY: {k: None for k in self.__KEYS_WEATHER_ATTRIB},
-                   self.__KEY_DATE: None}
-        if data_dic:
-            for key in self.__KEYS_WEATHER_ATTRIB:
-                summary[self.__KEY_SUMMARY][key] = int(data_dic[key])
-            summary[self.__KEY_DATE] = datetime.strptime(data_dic[self.__KEY_DATE], self.__DATE_FORMAT)
-        return summary
+    def __should_ignore_reading(self, line):
+        for key in WeatherObj.KEYS_WEATHER_ATTRIB:
+            if key not in line or not line[key]:
+                return True
+        else:
+            return False
 
     def __get_file_summary(self, name_of_file):
-        summary = {}
+        summary = None
         with open(name_of_file) as weather_file:
-            blank = weather_file.readline()
-            header = weather_file.readline()
+            weather_file.readline()
+            header = [item.strip() for item in weather_file.readline().split(",")]
+
             for line in weather_file.readlines()[:len(weather_file.readlines())-1]:
                 temp_data = dict(zip(header, line.split(",")))
-                temp_summary = self.__form_summary_dict(temp_data)
-                if not summary:
-                    summary = temp_summary
-                else:
-                    self.__update_attributes_summary(summary, temp_summary)
+                replace_string_in_dict(temp_data, self.__KEY_DATE_ALTER, self.__KEY_DATE)
+
+                if not self.__should_ignore_reading(temp_data):
+                    temp_summary = WeatherObj(temp_data)
+                    if not summary:
+                        summary = temp_summary
+                    else:
+                        summary.update_attributes_summary(temp_summary)
         return summary
+
+    def __update_year_summary(self, new_summary):
+        if new_summary:
+            year = new_summary.data[WeatherObj.KEY_DATE].year
+            if year in self.weather_data:
+                self.weather_data[year].update_attributes_summary(new_summary)
+            else:
+                self.weather_data[year] = new_summary
 
     def read_data(self):
         files_list = self.__get_file_list()
         for file_name in files_list:
-            summary = self.__get_file_summary(file_name)
-            if summary[self.__KEY_DATE].year in self.weather_data:
-                self.__update_attributes_summary(self.weather_data[summary[self.__KEY_DATE].year], summary)
-            else:
-                self.weather_data[summary[self.__KEY_DATE].year] = summary
+            new_summary = self.__get_file_summary(file_name)
 
-    def __form_year_summary_string(self, summary):
-        summary_string = ""
-        for keys in self.__KEYS_WEATHER_ATTRIB:
-            summary_string += f''
+            self.__update_year_summary(new_summary)
+
     def generate_summary_report(self):
-        print(f'')
-        for year, summary in self.weather_data:
-            print(f'{year}  {self.__form_year_summary_string(summary)}')
+        print(f'Year    MaxTemp    MinTemp  MaxHumidity     MinHumidity')
+        for year, summary in self.weather_data.items():
+            print(summary.year_summary())
 
     def generate_hot_days_report(self):
-        pass
-
+        print(f'Year    Date    MaxTemp')
+        for year, summary in self.weather_data.items():
+            print(summary.hot_day_summary())
