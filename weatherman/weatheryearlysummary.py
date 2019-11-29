@@ -21,10 +21,10 @@ class WeatherYearlySummary:
         summary = {k: None for k in self.KEYS_WEATHER_ATTRIB}
 
         if data_dic:
-            for key in self.KEYS_WEATHER_ATTRIB[:-1]:
-                summary[key] = int(data_dic[key])
+            for i in range(len(self.KEYS_WEATHER_ATTRIB[:-1])):
+                summary[self.KEYS_WEATHER_ATTRIB[i]] = int(data_dic[i])
             summary[self.KEY_DATE] = \
-                datetime.strptime(data_dic[self.KEY_DATE], self.__DATE_FORMAT)
+                datetime.strptime(data_dic[-1], self.__DATE_FORMAT)
         return summary
 
     def year_summary(self):

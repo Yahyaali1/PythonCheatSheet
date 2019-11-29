@@ -3,7 +3,7 @@ For reading data and generating weather report
 """
 import os
 from weatheryearlysummary import WeatherYearlySummary
-from utils import replace_string_in_dict
+from utils import replace_string_in_dict, replace_string_in_list
 
 
 class WeatherReport:
@@ -12,23 +12,25 @@ class WeatherReport:
         self.__path_to_dir = path_to_dir
         self.weather_data = dict()
 
-    def __should_ignore_reading(self, line):
-        for key in WeatherYearlySummary.KEYS_WEATHER_ATTRIB[:-1]:
-            if key not in line or not line[key]:
+    def __should_ignore_reading(self, data):
+        for i in data:
+            if not i:
                 return True
         else:
             return False
+
+    def __parse_line_data(self, header, line):
+        return [line[header.index(attributes)] for attributes in WeatherYearlySummary.KEYS_WEATHER_ATTRIB]
 
     def __get_file_summary(self, name_of_file):
         summary = None
         with open(name_of_file) as weather_file:
             weather_file.readline()
             header = [item.strip() for item in weather_file.readline().split(",")]
+            replace_string_in_list(header, WeatherYearlySummary.KEY_DATE_ALTER, WeatherYearlySummary.KEY_DATE)
 
             for line in weather_file.readlines()[:-1]:
-                temp_data = dict(zip(header, line.split(",")))
-                replace_string_in_dict(temp_data, WeatherYearlySummary.KEY_DATE_ALTER, WeatherYearlySummary.KEY_DATE)
-
+                temp_data = self.__parse_line_data(header, line.split(","))
                 if not self.__should_ignore_reading(temp_data):
                     temp_summary = WeatherYearlySummary(temp_data)
                     if not summary:

@@ -9,3 +9,8 @@ def is_hotter_day(old_min_temp, old_max_temp, new_min_temp, new_max_temp):
 def replace_string_in_dict(dict_data, old_key, new_key):
     if old_key in dict_data:
         dict_data[new_key] = dict_data.pop(old_key)
+
+
+def replace_string_in_list(list_data, old_item, new_item):
+    if old_item in list_data:
+        list_data[list_data.index(old_item)] = new_item
