@@ -6,11 +6,11 @@ from datetime import datetime
 from utils import is_hotter_day
 
 
-class WeatherObj:
+class WeatherYearlySummary:
     KEY_DATE = "PKT"
     KEY_DATE_ALTER = "PKST"
     KEY_SUMMARY = "SUMMARY"
-    KEYS_WEATHER_ATTRIB = ["Max TemperatureC", "Min TemperatureC", "Max Humidity", "Min Humidity"]
+    KEYS_WEATHER_ATTRIB = ["Max TemperatureC", "Min TemperatureC", "Max Humidity", "Min Humidity", KEY_DATE]
     __DATE_FORMAT = '%Y-%m-%d'
     DATE_FORMAT_OUTPUT = '%d/%m/%Y'
 
@@ -19,10 +19,9 @@ class WeatherObj:
 
     def __form_summary_dict(self, data_dic):
         summary = {k: None for k in self.KEYS_WEATHER_ATTRIB}
-        summary[self.KEY_DATE] = None
 
         if data_dic:
-            for key in self.KEYS_WEATHER_ATTRIB:
+            for key in self.KEYS_WEATHER_ATTRIB[:-1]:
                 summary[key] = int(data_dic[key])
             summary[self.KEY_DATE] = \
                 datetime.strptime(data_dic[self.KEY_DATE], self.__DATE_FORMAT)
@@ -30,7 +29,7 @@ class WeatherObj:
 
     def year_summary(self):
         summary_string = f'{self.get_date().year}   '
-        for key in self.KEYS_WEATHER_ATTRIB:
+        for key in self.KEYS_WEATHER_ATTRIB[:-1]:
             summary_string += f'{self.data[key]}      '
         return summary_string
 
