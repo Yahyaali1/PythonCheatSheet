@@ -37,7 +37,6 @@ class WeatherYearlySummary:
     def hot_day_summary(self):
         """
         Formatted string for temperature
-        :return:
         """
         return f'{self.get_date().year}  {self.get_date().strftime(self.DATE_FORMAT_OUTPUT)}    ' \
                f'{self.get_max_temp()}'
@@ -54,8 +53,7 @@ class WeatherYearlySummary:
     def update_attributes_summary(self, weather_obj_new):
         """
         Update the date for hottest day
-        Updates other attributes if necessary
-        :param weather_obj_new:
+        Updates min max temp & humidity
         """
         if is_hotter_day(self.get_min_temp(), self.get_max_temp(), weather_obj_new.get_min_temp(),
                          weather_obj_new.get_min_temp()):
