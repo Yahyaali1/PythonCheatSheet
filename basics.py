@@ -73,3 +73,47 @@ print("Valid Expression example", full_name_exp)
 # - Div for int and floating point
 # Exponent operators
 # Augmented Operator
+
+class A:
+    def __init__(self, *b,**a):
+        self.__a="parent" + str(a) + str(b)
+        self.normal = "normal"
+    
+    def read_class_args(self):
+        return self.__class__.__dict__.items()   
+
+    def read_inst_args(self):
+        return self.__dict__.items()
+
+    def __str__(self):
+        return self.__a
+
+class B(A):
+    c = "A"
+    def __str__(self):
+        self._a = "Hello world"
+        self.normal = "Normal2"
+        return self._a + self.normal
+
+
+A = A(a="a", b="b", c="c")
+second = B(a="a", b="b", c="c")
+
+class C:
+    def __init__(self, a, b):
+        self.a=a
+        self.b=b
+    def __str__(self):
+        return self.a + self.b
+
+
+second.__class__.c = " changed"
+print(second)
+print(A)
+print(A.read_class_args(), "Expression")
+print(second.read_inst_args(), "Expression  Instance args")
+print(second.read_class_args(), "Expression  class args")
+
+print(C(**{"a":"a","b":"b", "d":"d"}))
+
+
