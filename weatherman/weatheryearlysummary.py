@@ -3,6 +3,7 @@ Weather object for keeping relevant details
 Provides keys for  data in dictionary
 """
 from datetime import datetime
+
 from utils import is_hotter_day
 
 

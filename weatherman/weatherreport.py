@@ -2,8 +2,9 @@
 For reading data and generating weather report
 """
 import os
+
+from utils import replace_string_in_list
 from weatheryearlysummary import WeatherYearlySummary
-from utils import replace_string_in_dict, replace_string_in_list
 
 
 class WeatherReport:
@@ -50,7 +51,6 @@ class WeatherReport:
     def read_data(self):
         for file_name in os.listdir(f'.{self.__path_to_dir}'):
             new_summary = self.__get_file_summary(f'.{self.__path_to_dir}/{file_name}')
-
             self.__update_year_summary(new_summary)
 
     def generate_summary_report(self):

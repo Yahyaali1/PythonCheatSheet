@@ -1,6 +1,6 @@
-from weatherreport import WeatherReport
-import sys
 import argparse
+
+from weatherreport import WeatherReport
 
 PROGRAM_INSTRUCTION = """
     Usage: weatherman [report_type] [data_dir]

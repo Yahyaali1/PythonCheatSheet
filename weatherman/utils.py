@@ -1,5 +1,5 @@
 """
-Helper Functions for temperature comparison
+Helper Functions for weatherman task
 """
 
 
