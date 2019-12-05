@@ -1,12 +1,12 @@
 import argparse
 
-from argsvalidator import DirValidator, ReportNumberValidator
+from argsvalidator import dir_validator
 from weatherreport import WeatherReport
 
 parser = argparse.ArgumentParser(epilog="For forming report on the data provided in data_dir")
-parser.add_argument("report_type", type=int, action=ReportNumberValidator, help="""1 for Annual Max/Min Temperature
+parser.add_argument("report_type", type=int, choices=[1, 2], help="""1 for Annual Max/Min Temperature
     2 for Hottest day of each year""")
-parser.add_argument("data_dir", type=str, action=DirValidator, help="Directory containing weather data files")
+parser.add_argument("data_dir", type=dir_validator, help="Directory containing weather data files")
 
 
 def main():

@@ -4,25 +4,28 @@ Weather object for keeping relevant details
 
 
 class WeatherYearlySummary:
-    KEY_DATE = "PKT"
-    KEY_DATE_ALTER = "PKST"
-    KEYS_WEATHER_ATTRIB = ["Max TemperatureC", "Min TemperatureC", "Max Humidity", "Min Humidity", KEY_DATE]
-
-    def __init__(self, data, date):
-        self.attributes = data
+    def __init__(self, max_temp, min_temp, max_humidity, min_humidity, date):
+        self.max_temp = max_temp
+        self.min_temp = min_temp
+        self.max_humidity = max_humidity
+        self.min_humidity = min_humidity
         self.date = date
 
     def year_summary(self):
-        string = f'{self.date.year:<10}'
-        for attribute in self.attributes:
-            string += f'{attribute:<10}'
-        return string
+        return f'{self.date.year:<10}{self.print_attrib(self.max_temp):<10}{self.print_attrib(self.min_temp):<10}' \
+               f'{self.print_attrib(self.max_humidity):<10}{self.print_attrib(self.min_temp):<10}'
+
+    def print_attrib(self, value):
+        return str(None) if value is None else value
 
     def hot_day_summary(self):
         """
         Formatted string for temperature
         """
-        return f'{self.date.year:<10}{self.date.strftime("%d/%m/%Y")}{"":<10}{self.attributes[0]:<10}'
+        return f'{self.date.year:<10}{self.date.strftime("%d/%m/%Y")}{"":<10}{self.print_attrib(self.max_temp):<10}'
+
+    def __get_updated_attribute(self, old_attribute, new_attribute):
+        return new_attribute if self.__should_update_attribute(old_attribute, new_attribute) else old_attribute
 
     def __should_update_attribute(self, old_attribute, new_attribute):
         if old_attribute is None:
@@ -31,13 +34,15 @@ class WeatherYearlySummary:
             return False
         return old_attribute < new_attribute
 
-    def update_attributes_summary(self, new_attributes, date):
+    def update_attributes_summary(self, max_temp, min_temp, max_humidity, min_humidity, date):
         """
         Update the date for hottest day
         Updates min max temp & humidity
         """
-        if self.__should_update_attribute(self.attributes[0], new_attributes[0]):
+        if self.__should_update_attribute(self.max_temp, max_temp):
             self.date = date
-        for index in range(len(self.attributes)):
-            if self.__should_update_attribute(self.attributes[index], new_attributes[index]):
-                self.attributes[index] = new_attributes[index]
+            self.max_temp = max_temp
+
+        self.min_temp = self.__get_updated_attribute(self.min_temp, min_temp)
+        self.max_humidity = self.__get_updated_attribute(self.max_humidity, max_humidity)
+        self.min_humidity = self.__get_updated_attribute(self.min_humidity, min_humidity)

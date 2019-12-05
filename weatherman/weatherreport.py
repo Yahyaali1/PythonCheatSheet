@@ -4,18 +4,25 @@ For reading data and generating weather report
 import os
 from datetime import datetime
 
-from utils import replace_string_in_list
 from weatheryearlysummary import WeatherYearlySummary
 
 
 class WeatherReport:
+    KEY_DATE = "PKT"
+    KEY_DATE_ALTER = "PKST"
+    KEYS_WEATHER_ATTRIB = ["Max TemperatureC", "Min TemperatureC", "Max Humidity", "Min Humidity", KEY_DATE]
 
     def __init__(self, path_to_dir):
         self.__path_to_dir = path_to_dir
         self.weather_data = dict()
 
     def __generate_header_index(self, header):
-        return [header.index(attributes) for attributes in WeatherYearlySummary.KEYS_WEATHER_ATTRIB]
+        header_index = [header.index(attributes) for attributes in self.KEYS_WEATHER_ATTRIB[:-1]]
+        try:
+            header_index.append(header.index(self.KEY_DATE))
+        except ValueError:
+            header_index.append(header.index(self.KEY_DATE_ALTER))
+        return header_index
 
     def __parse_line_attribute_data(self, header_index, line):
         return [int(line[index]) if line[index] else None for index in header_index]
@@ -27,7 +34,6 @@ class WeatherReport:
         with open(name_of_file) as weather_file:
             weather_file.readline()
             header = [item.strip() for item in weather_file.readline().split(",")]
-            replace_string_in_list(header, WeatherYearlySummary.KEY_DATE_ALTER, WeatherYearlySummary.KEY_DATE)
             header_index = self.__generate_header_index(header)
 
             for line in weather_file.readlines()[:-1]:
@@ -38,11 +44,11 @@ class WeatherReport:
                     self.__update_year_summary(temp_data_attributes, temp_date)
 
     def __update_year_summary(self, new_summary_attributes, new_date):
-            year = new_date.year
-            if year in self.weather_data:
-                self.weather_data[year].update_attributes_summary(new_summary_attributes, new_date)
-            else:
-                self.weather_data[year] = WeatherYearlySummary(new_summary_attributes, new_date)
+        year = new_date.year
+        if year in self.weather_data:
+            self.weather_data[year].update_attributes_summary(*new_summary_attributes, new_date)
+        else:
+            self.weather_data[year] = WeatherYearlySummary(*new_summary_attributes, new_date)
 
     def read_data(self):
         for file_name in os.listdir(f'.{self.__path_to_dir}'):
