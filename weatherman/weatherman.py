@@ -10,11 +10,7 @@ parser.add_argument("data_dir", type=dir_validator, help="Directory containing w
 
 
 def main():
-    try:
         args = parser.parse_args()
-    except argparse.ArgumentTypeError as exception:
-        print(str(exception))
-    else:
         weather_report = WeatherReport(args.data_dir)
         weather_report.read_data()
         if args.report_type == 1:
