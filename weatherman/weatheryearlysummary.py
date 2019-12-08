@@ -4,25 +4,23 @@ Weather object for keeping relevant details
 
 
 class WeatherYearlySummary:
-    def __init__(self, max_temp, min_temp, max_humidity, min_humidity, date):
-        self.max_temp = max_temp
-        self.min_temp = min_temp
-        self.max_humidity = max_humidity
-        self.min_humidity = min_humidity
-        self.date = date
+    DATE_VALUE_ERROR = "Date value is None"
+
+    def __init__(self):
+        self.max_temp, self.min_temp, self.max_humidity, self.min_humidity, self.date = [None] * 5
 
     def year_summary(self):
-        return f'{self.date.year:<10}{self.print_attrib(self.max_temp):<10}{self.print_attrib(self.min_temp):<10}' \
-               f'{self.print_attrib(self.max_humidity):<10}{self.print_attrib(self.min_temp):<10}'
-
-    def print_attrib(self, value):
-        return str(None) if value is None else value
+        return self.DATE_VALUE_ERROR if self.date is None else f'{self.date.year:<10}{str(self.max_temp):<10}' \
+                                                               f'{str(self.min_temp):<10}{str(self.max_humidity):<10}' \
+                                                               f'{str(self.min_temp):<10}'
 
     def hot_day_summary(self):
         """
         Formatted string for temperature
         """
-        return f'{self.date.year:<10}{self.date.strftime("%d/%m/%Y")}{"":<10}{self.print_attrib(self.max_temp):<10}'
+        return self.DATE_VALUE_ERROR if self.date is None else f'{self.date.year:<10}' \
+                                                               f'{self.date.strftime("%d/%m/%Y"):<20}' \
+                                                               f'{str(self.max_temp):<10}'
 
     def __get_updated_attribute(self, old_attribute, new_attribute):
         return new_attribute if self.__should_update_attribute(old_attribute, new_attribute) else old_attribute

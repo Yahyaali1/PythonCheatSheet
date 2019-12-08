@@ -2,6 +2,7 @@
 For reading data and generating weather report
 """
 import os
+from collections import defaultdict
 from datetime import datetime
 
 from weatheryearlysummary import WeatherYearlySummary
@@ -10,14 +11,15 @@ from weatheryearlysummary import WeatherYearlySummary
 class WeatherReport:
     KEY_DATE = "PKT"
     KEY_DATE_ALTER = "PKST"
-    KEYS_WEATHER_ATTRIB = ["Max TemperatureC", "Min TemperatureC", "Max Humidity", "Min Humidity", KEY_DATE]
+    KEYS_WEATHER_ATTRIB = ["Max TemperatureC", "Min TemperatureC", "Max Humidity", "Min Humidity"]
 
     def __init__(self, path_to_dir):
         self.__path_to_dir = path_to_dir
-        self.weather_data = dict()
+        self.weather_data = defaultdict(WeatherYearlySummary)
+        self.read_data()
 
     def __generate_header_index(self, header):
-        header_index = [header.index(attributes) for attributes in self.KEYS_WEATHER_ATTRIB[:-1]]
+        header_index = [header.index(attributes) for attributes in self.KEYS_WEATHER_ATTRIB]
         try:
             header_index.append(header.index(self.KEY_DATE))
         except ValueError:
@@ -41,25 +43,18 @@ class WeatherReport:
                 temp_data_attributes = self.__parse_line_attribute_data(header_index[:-1], line_data)
                 temp_date = self.__parse_line_date(header_index[-1], line_data)
                 if temp_date is not None:
-                    self.__update_year_summary(temp_data_attributes, temp_date)
-
-    def __update_year_summary(self, new_summary_attributes, new_date):
-        year = new_date.year
-        if year in self.weather_data:
-            self.weather_data[year].update_attributes_summary(*new_summary_attributes, new_date)
-        else:
-            self.weather_data[year] = WeatherYearlySummary(*new_summary_attributes, new_date)
+                    self.weather_data[temp_date.year].update_attributes_summary(*temp_data_attributes, temp_date)
 
     def read_data(self):
         for file_name in os.listdir(f'.{self.__path_to_dir}'):
             self.__get_file_summary(f'.{self.__path_to_dir}/{file_name}')
 
     def generate_summary_report(self):
-        print(f'Year    MaxTemp    MinTemp  MaxHumidity     MinHumidity')
+        print(f'{"Year":<10}{"MaxTemp":<10}{"MinTemp":<10}{"MaxHumidity":<10}{"MinHumidity":<20}')
         for year, summary in self.weather_data.items():
             print(summary.year_summary())
 
     def generate_hot_days_report(self):
-        print(f'Year    Date    MaxTemp')
+        print(f'{"Year":<10}{"Date":<20}{"MaxTemp":<10}')
         for year, summary in self.weather_data.items():
             print(summary.hot_day_summary())
