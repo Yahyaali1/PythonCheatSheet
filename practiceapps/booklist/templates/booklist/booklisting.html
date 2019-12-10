@@ -4,12 +4,45 @@
 {% block nav_content %}
 {% endblock nav_content %}
 {% block content %}
-{% if form.errors %}
-    <p>Your username and password didn't match. Please try again.</p>
+{% if form %}
+{% if errors %}
 {% endif %}
 <form method="post" action="{% url 'booklist:add_book' %}">
     {% csrf_token %}
     {{ form.as_table }}
     <input type="submit" value="Add Book">
 </form>
+{% endif %}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Owner</th>
+        <th scope="col">Title</th>
+        <th scope="col">Price</th>
+        <th scope="col">Page Count</th>
+        <th scope="col">Date Bought</th>
+        <th scope="col">Delete</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for book in books %}
+        <tr>
+            <th scope="row">{{ forloop.counter}}</th>
+            <td>{{ book.owner.username}}</td>
+            <td>{{ book.name}}</td>
+            <td>{{ book.price }}</td>
+            <td>{{ book.page_count }}</td>
+            <td>{{ book.date_added }}</td>
+            <td>Delete</td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td>No Books to show ! Add Books</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+
+</table>
 {% endblock content %}
