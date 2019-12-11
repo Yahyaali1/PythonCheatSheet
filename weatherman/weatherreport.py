@@ -18,13 +18,13 @@ class WeatherReport:
         self.weather_data = defaultdict(WeatherYearlySummary)
         self.read_data()
 
-    def __generate_header_index(self, header):
-        header_index = [header.index(attributes) for attributes in self.KEYS_WEATHER_ATTRIB]
+    def __generate_attribute_index(self, header):
+        attributes_index = [header.index(attributes) for attributes in self.KEYS_WEATHER_ATTRIB]
         try:
-            header_index.append(header.index(self.KEY_DATE))
+            attributes_index.append(header.index(self.KEY_DATE))
         except ValueError:
-            header_index.append(header.index(self.KEY_DATE_ALTER))
-        return header_index
+            attributes_index.append(header.index(self.KEY_DATE_ALTER))
+        return attributes_index
 
     def __parse_line_attribute_data(self, header_index, line):
         return [int(line[index]) if line[index] else None for index in header_index]
@@ -36,12 +36,12 @@ class WeatherReport:
         with open(name_of_file) as weather_file:
             weather_file.readline()
             header = [item.strip() for item in weather_file.readline().split(",")]
-            header_index = self.__generate_header_index(header)
+            attributes_index = self.__generate_attribute_index(header)
 
             for line in weather_file.readlines()[:-1]:
                 line_data = line.split(",")
-                temp_data_attributes = self.__parse_line_attribute_data(header_index[:-1], line_data)
-                temp_date = self.__parse_line_date(header_index[-1], line_data)
+                temp_data_attributes = self.__parse_line_attribute_data(attributes_index[:-1], line_data)
+                temp_date = self.__parse_line_date(attributes_index[-1], line_data)
                 if temp_date is not None:
                     self.weather_data[temp_date.year].update_attributes_summary(*temp_data_attributes, temp_date)
 
