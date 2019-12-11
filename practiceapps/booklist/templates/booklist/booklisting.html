@@ -1,33 +1,39 @@
 {% extends "booklist/base.html" %}
 {% block title %} Books {% endblock title %}
 {% block nav_title %} Book List App {% endblock %}
-{% block nav_content %}
-{% endblock nav_content %}
+    {% block nav_content %}
+    {% endblock nav_content %}
 {% block content %}
-{% if form %}
-{% if errors %}
-{% endif %}
-<form method="post" action="{% url 'booklist:add_book' %}">
-    {% csrf_token %}
-    {{ form.as_table }}
-    <input type="submit" value="Add Book">
-</form>
-{% endif %}
+    {% if alerts %}
+        {% for alert in alerts %}
+            <div class="alert {% if not alert.error %} alert-success {% else %} alert-danger {% endif %}">
+                 <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>{{alert.message}}{{alert.error}}</strong>
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% if form %}
+        <form method="post" action="{% url 'booklist:add_book' %}">
+            {% csrf_token %}
+            {{ form.as_table }}
+            <input type="submit" value="Add Book">
+        </form>
+    {% endif %}
 
-<table class="table">
-    <thead>
-    <tr>
-        <th scope="col">#</th>
-        <th scope="col">Owner</th>
-        <th scope="col">Title</th>
-        <th scope="col">Price</th>
-        <th scope="col">Page Count</th>
-        <th scope="col">Date Bought</th>
-        <th scope="col">Delete</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for book in books %}
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Owner</th>
+            <th scope="col">Title</th>
+            <th scope="col">Price</th>
+            <th scope="col">Page Count</th>
+            <th scope="col">Date Bought</th>
+            <th scope="col">Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for book in books %}
         <tr>
             <th scope="row">{{ forloop.counter}}</th>
             <td>{{ book.owner.username}}</td>
@@ -37,12 +43,12 @@
             <td>{{ book.date_added }}</td>
             <td>Delete</td>
         </tr>
-    {% empty %}
+        {% empty %}
         <tr>
             <td>No Books to show ! Add Books</td>
         </tr>
-    {% endfor %}
-    </tbody>
+        {% endfor %}
+        </tbody>
 
-</table>
+    </table>
 {% endblock content %}
