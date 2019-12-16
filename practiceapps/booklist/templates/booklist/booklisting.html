@@ -16,7 +16,14 @@
     {% if form %}
         <form method="post" action="{% url 'booklist:add_book' %}">
             {% csrf_token %}
-            {{ form.as_table }}
+            {% for field in form %}
+                {% if not field.name == "owner" %}
+                <div class="fieldWrapper">
+                        {{ field.errors }}
+                        {{ field.label_tag }} {{ field }}
+                </div>
+            {% endif %}
+            {% endfor %}
             <input type="submit" value="Add Book">
         </form>
     {% endif %}
