@@ -36,11 +36,13 @@ class BookView(LoginRequiredMixin, View):
         alert_messages = []
         book_form = BookForm(request.POST)
         user_book_list = Book.objects.all()if request.user.is_staff else request.user.books.all()
+
         if book_form.is_valid():
-            book_form.save()
+            book_form.save(user=request.user)
             alert_messages.append(get_alert_message("Book Added", error=False))
             book_form = BookForm(initial={'owner': request.user.id})
 
+        print(book_form)
         return render(request, template_name="booklist/booklisting.html", context={'form': book_form,
                                                                                    'books': user_book_list,
                                                                                    'alerts': alert_messages})
