@@ -1,0 +1,67 @@
+{% extends "booklist/base.html" %}
+{% block title %} Books {% endblock title %}
+{% block nav_title %} Book List App {% endblock %}
+    {% block nav_content %}
+        <p><a href="{% url 'booklist:logout' %}">Logout</a></p>
+    {% endblock nav_content %}
+{% block content %}
+    {% if alerts %}
+        {% for alert in alerts %}
+            <div class="alert {% if not alert.error %} alert-success {% else %} alert-danger {% endif %}">
+                 <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong>{{alert.message}}</strong>
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% if form %}
+        <form method="post" action="{% url 'booklist:add_book' %}">
+            {% csrf_token %}
+            {{form}}
+            <input type="submit" value="Add Book">
+        </form>
+    {% endif %}
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Title</th>
+            <th scope="col">Price</th>
+            <th scope="col">Page Count</th>
+            <th scope="col">Date Bought</th>
+            {% if user.is_staff %}
+                <th scope="col">Owner</th>
+                <th scope="col">Delete</th>
+            {% endif %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for book in books %}
+        <tr>
+            <th scope="row">{{ forloop.counter}}</th>
+
+            <td>{{ book.name}}</td>
+            <td>{{ book.price }}</td>
+            <td>{{ book.page_count }}</td>
+            <td>{{ book.date_added }}</td>
+            {% if user.is_staff %}
+            <td>{{ book.owner.username}}</td>
+            <td>
+                <form method="post" action="{% url 'booklist:del_book'%}">
+                    {% csrf_token %}
+                    <input type="number" value={{book.id}} hidden="true" name="book_id">
+                    <input class="btn btn btn-danger" type="submit" value="Delete">
+                    <input type="hidden" name="next" value="{% url 'booklist:home' %}">
+                </form>
+            </td>
+            {% endif %}
+        </tr>
+        {% empty %}
+        <tr>
+            <td>No Books to show ! Add Books</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+{% endblock content %}
